@@ -16,6 +16,16 @@ self.addEventListener('install', (event) => {
 
 // Enhanced fetch handler with smart routing optimizations
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Bug: Force redirect to homepage for any URL with query parameters (for direct navigation)
+  if (url.search && (event.request.mode === 'navigate' || event.request.destination === 'document')) {
+    event.respondWith(
+      Response.redirect('/', 302)
+    );
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -24,12 +34,15 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
         
-        const url = new URL(event.request.url);
-        
-        // Smart SPA routing enhancement for better performance
-        if (url.search && url.pathname !== '/') {
-          // Serve cached homepage for parameterized routes
-          return caches.match('/');
+        // Bug: Also catch any other requests with query parameters
+        if (url.search) {
+          // Serve cached homepage for any parameterized routes
+          return caches.match('/').then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            return fetch('/');
+          });
         }
         
         // Fallback to network for uncached resources

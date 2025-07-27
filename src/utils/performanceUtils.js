@@ -260,9 +260,7 @@ export const measurePerformance = (func, label = 'Function') => {
     const startTime = performance.now();
     const result = func.apply(this, args);
     const endTime = performance.now();
-    
-    console.log(`${label} took ${endTime - startTime} milliseconds.`);
-    
+        
     return result;
   };
 };

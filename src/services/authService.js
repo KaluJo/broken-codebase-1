@@ -78,29 +78,21 @@ const validateToken = (token) => {
 
 export const authService = {
   async login(credentials) {
-    console.log('🏪 AuthService login called with:', credentials);
     
     // Simulate API delay
-    console.log('⏳ Simulating API delay...');
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const { email, password } = credentials;
-    console.log('🔍 Looking for user with email:', email);
     const user = mockUsers.find(u => u.email === email && u.password === password);
     
     if (!user) {
-      console.error('❌ User not found or password mismatch');
-      console.log('🗃️ Available users:', mockUsers.map(u => ({ email: u.email, password: u.password })));
       throw new Error('Invalid email or password');
     }
-
-    console.log('👤 Found user:', { id: user.id, email: user.email, name: user.name, role: user.role });
 
     // Update last login
     user.lastLogin = new Date().toISOString();
 
     const token = generateToken(user);
-    console.log('🎫 Generated token for user');
     
     const response = {
       token,
@@ -116,7 +108,6 @@ export const authService = {
       sessionExpiry: new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString(),
     };
     
-    console.log('📤 Returning login response:', response);
     return response;
   },
 

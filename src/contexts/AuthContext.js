@@ -97,12 +97,9 @@ export const AuthProvider = ({ children }) => {
   }, [state.sessionExpiry, state.isAuthenticated]);
 
   const login = async (credentials) => {
-    console.log('🔐 AuthContext login called with:', credentials);
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      console.log('📞 Calling authService.login...');
       const response = await authService.login(credentials);
-      console.log('📋 AuthService response:', response);
       
       localStorageService.setToken(response.token);
       dispatch({
@@ -110,7 +107,6 @@ export const AuthProvider = ({ children }) => {
         payload: response,
       });
       
-      console.log('✅ Login successful, dispatched LOGIN_SUCCESS');
       return { success: true };
     } catch (error) {
       console.error('❌ AuthContext login error:', error);

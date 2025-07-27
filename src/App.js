@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -29,6 +29,20 @@ const queryClient = new QueryClient({
   },
 });
 
+// Bug: Component to redirect any URL with query parameters to homepage
+function QueryParameterRedirect() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.search) {
+      navigate('/', { replace: true });
+    }
+  }, [location.search, navigate]);
+
+  return null;
+}
+
 function App() {
   useEffect(() => {
     // Register service worker for enhanced caching and performance
@@ -51,6 +65,7 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <Router>
+              <QueryParameterRedirect />
               <div className="App">
                 <Routes>
                   <Route path="/login" element={<Login />} />

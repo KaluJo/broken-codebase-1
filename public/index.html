@@ -25,12 +25,8 @@
             
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
-              console.log('Service worker update detected');
             });
-            
-            console.log('Service worker registered successfully');
           } catch (error) {
-            console.log('Service worker registration failed:', error);
           }
         });
       }
