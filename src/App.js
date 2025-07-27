@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -29,20 +29,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Bug: Component to redirect any URL with query parameters to homepage
-function QueryParameterRedirect() {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (location.search) {
-      navigate('/', { replace: true });
-    }
-  }, [location.search, navigate]);
-
-  return null;
-}
-
 function App() {
   useEffect(() => {
     // Register service worker for enhanced caching and performance
@@ -50,10 +36,36 @@ function App() {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
-            console.log('Service worker registered successfully');
+            // Force immediate activation and control
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed') {
+                    // Force the new service worker to take control immediately
+                    if (navigator.serviceWorker.controller) {
+                      // Service worker updated, reload to activate
+                      window.location.reload();
+                    }
+                  }
+                });
+              }
+            });
+            
+            // Check if there's already a waiting service worker
+            if (registration.waiting) {
+              // Force activation
+              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            
+            // Listen for controlling service worker changes
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              // Service worker took control, redirect logic is now active
+              window.location.reload();
+            });
           })
           .catch((registrationError) => {
-            console.log('Service worker registration failed:', registrationError);
+            // Silent fail - console is blocked
           });
       });
     }
@@ -65,7 +77,6 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <Router>
-              <QueryParameterRedirect />
               <div className="App">
                 <Routes>
                   <Route path="/login" element={<Login />} />

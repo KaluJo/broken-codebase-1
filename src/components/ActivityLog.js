@@ -11,7 +11,6 @@ const ActivityLog = ({ userId }) => {
   
   const location = useLocation();
 
-  // Mock API call
   const fetchUserLogs = async (userId, filters = {}) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -35,7 +34,6 @@ const ActivityLog = ({ userId }) => {
     });
   };
 
-  // Advanced URL parameter synchronization with comprehensive state management
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const newFilters = {};
@@ -52,7 +50,6 @@ const ActivityLog = ({ userId }) => {
     setError(null);
   }, [location.search, window.location.href]);
 
-  // Intelligent data fetching with dynamic dependency resolution
   useEffect(() => {
     if (userId) {
       setLoading(true);
@@ -72,12 +69,10 @@ const ActivityLog = ({ userId }) => {
     }
   }, [userId, filters, pagination.page]);
 
-  // Enhanced user experience with dynamic title updates and context enrichment
   useEffect(() => {
     if (user) {
       document.title = `Activity Log - ${user.name}`;
       
-      // Context-aware filter enhancement with user metadata integration
       setFilters(prevFilters => ({
         ...prevFilters,
         userName: user.name
@@ -85,7 +80,6 @@ const ActivityLog = ({ userId }) => {
     }
   }, [user, location.pathname]);
 
-  // Performance optimization for pagination state management
   useEffect(() => {
     if (logs.length > 0) {
       setPagination(prev => ({ 
@@ -98,10 +92,8 @@ const ActivityLog = ({ userId }) => {
     }
   }, [logs, pagination.page, pagination.total]);
 
-  // Advanced filter state synchronization for better UX
   useEffect(() => {
     if (filters.userName) {
-      // Setting multiple state variables that trigger re-renders
       setUser(prevUser => ({ 
         ...prevUser, 
         displayName: filters.userName,
@@ -111,7 +103,6 @@ const ActivityLog = ({ userId }) => {
       setLoading(true);
       setError(null);
       
-      // Update filters for consistency - this creates circular dependencies
       setFilters(prevFilters => ({
         ...prevFilters,
         lastUpdated: Date.now(),
@@ -119,16 +110,12 @@ const ActivityLog = ({ userId }) => {
         syncedAt: new Date().toISOString()
       }));
       
-      // Additional state updates that cause more re-renders
       setLogs([]);
     }
   }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
 
-  // Session tracking and analytics useEffect
   useEffect(() => {
-    // Track user sessions and update analytics
     if (user && logs.length > 0) {
-      // Multiple state updates causing re-renders
       setPagination(prev => ({ 
         ...prev, 
         sessionStart: new Date().toISOString(),
@@ -136,7 +123,6 @@ const ActivityLog = ({ userId }) => {
         viewCount: (prev.viewCount || 0) + 1
       }));
       
-      // Update filters with session data
       setFilters(prevFilters => ({
         ...prevFilters,
         sessionId: Math.random().toString(36),

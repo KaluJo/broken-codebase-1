@@ -268,14 +268,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
-              {/* Analytics and reporting section */}
-      <div className="card" style={{marginTop: '2rem', background: '#f8f9fa', border: '1px solid #dee2e6'}}>
-        <p style={{margin: 0, color: '#6c757d'}}>
-          💡 <strong>Tip:</strong> Try navigating to the User Logs page with query parameters like <code>?user=123</code> 
-          to see detailed activity logs for specific users.
-        </p>
-      </div>
     </div>
   );
 };

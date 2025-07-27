@@ -22,15 +22,14 @@ const UserLogs = () => {
   const handleUserSubmit = (e) => {
     e.preventDefault();
     if (userInput.trim()) {
-      // Navigate to the same page with user query parameter
-      // This will trigger the service worker issue in production
-      navigate(`/user-logs?user=${userInput.trim()}`);
+      window.location.href = `/user-logs?user=${userInput.trim()}`;
     }
   };
 
   const handleClearUser = () => {
     setSelectedUser(null);
     setUserInput('');
+    // Use React Router for clearing (no query params to trigger redirect)
     navigate('/user-logs');
   };
 

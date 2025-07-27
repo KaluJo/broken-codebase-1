@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { formatDate, getDateRanges, createDateRangeFilter } from '../utils/dateUtils';
 import { debounce } from '../utils/performanceUtils';
 
 const Analytics = () => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('last30Days');
   const [metrics, setMetrics] = useState({});
@@ -14,7 +16,6 @@ const Analytics = () => {
   const { hasPermission } = useAuth();
   const { showError } = useNotifications();
 
-  // Mock analytics data
   const mockData = {
     users: {
       total: 15284,
@@ -84,19 +85,25 @@ const Analytics = () => {
     },
   };
 
-  // Simulate API call
+  // Initialize dateRange from URL query parameter
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const dateRangeParam = searchParams.get('dateRange');
+    
+    if (dateRangeParam) {
+      setDateRange(dateRangeParam);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     const fetchAnalytics = async () => {
       setLoading(true);
       try {
-        // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1200));
         
-        // Apply date range filter
         const dateRanges = getDateRanges();
         const filterFn = createDateRangeFilter(dateRange);
         
-        // Filter mock data based on date range
         const filteredData = Object.keys(mockData).reduce((acc, key) => {
           const data = mockData[key];
           const filteredChartData = data.chartData.filter(item => 
@@ -122,7 +129,6 @@ const Analytics = () => {
     fetchAnalytics();
   }, [dateRange, selectedMetric, showError]);
 
-  // Debounced metric selection
   const debouncedMetricChange = useMemo(
     () => debounce((metric) => {
       setChartData(metrics[metric] || {});
@@ -158,6 +164,12 @@ const Analytics = () => {
     return change > 0 ? 'success' : change < 0 ? 'danger' : 'neutral';
   };
 
+  const handleDateRangeChange = (e) => {
+    const newDateRange = e.target.value;
+    // Update URL with query parameter and refresh page
+    window.location.href = `/analytics?dateRange=${newDateRange}`;
+  };
+
   if (!hasPermission('analytics:read')) {
     return (
       <div className="access-denied">
@@ -185,7 +197,7 @@ const Analytics = () => {
         <div className="page-controls">
           <select
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
+            onChange={handleDateRangeChange}
             className="date-range-select"
           >
             <option value="today">Today</option>
