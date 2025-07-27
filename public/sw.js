@@ -51,7 +51,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // REDIRECT ANY URL WITH QUERY PARAMETERS TO ROOT
   if (url.search) {    
     // For navigation requests, redirect to homepage
     if (event.request.mode === 'navigate' || event.request.destination === 'document') {
