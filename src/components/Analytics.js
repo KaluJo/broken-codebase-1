@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { formatDate, getDateRanges, createDateRangeFilter } from '../utils/dateUtils';
@@ -7,6 +7,7 @@ import { debounce } from '../utils/performanceUtils';
 
 const Analytics = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('last30Days');
   const [metrics, setMetrics] = useState({});
@@ -91,9 +92,19 @@ const Analytics = () => {
     const dateRangeParam = searchParams.get('dateRange');
     
     if (dateRangeParam) {
-      setDateRange(dateRangeParam);
+      // Validate the dateRange parameter
+      const dateRanges = getDateRanges();
+      const validDateRanges = Object.keys(dateRanges);
+      
+      if (validDateRanges.includes(dateRangeParam)) {
+        setDateRange(dateRangeParam);
+      } else {
+        console.warn(`Invalid date range in URL: ${dateRangeParam}, using default`);
+        // Update URL to use default
+        navigate('/analytics?dateRange=last30Days');
+      }
     }
-  }, [location.search]);
+  }, [location.search, navigate]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -101,26 +112,56 @@ const Analytics = () => {
       try {
         await new Promise(resolve => setTimeout(resolve, 1200));
         
+        // Validate dateRange against available options
         const dateRanges = getDateRanges();
+        const validDateRanges = Object.keys(dateRanges);
+        
+        if (!validDateRanges.includes(dateRange)) {
+          console.warn(`Invalid date range: ${dateRange}, using default`);
+          setDateRange('last30Days');
+          setMetrics(mockData);
+          setChartData(mockData[selectedMetric] || mockData.users);
+          setLoading(false);
+          return;
+        }
+        
         const filterFn = createDateRangeFilter(dateRange);
+        
+        // Add safety check for filter function
+        if (typeof filterFn !== 'function') {
+          console.warn('Invalid filter function, using default data');
+          setMetrics(mockData);
+          setChartData(mockData[selectedMetric] || mockData.users);
+          setLoading(false);
+          return;
+        }
         
         const filteredData = Object.keys(mockData).reduce((acc, key) => {
           const data = mockData[key];
-          const filteredChartData = data.chartData.filter(item => 
-            filterFn({ createdAt: item.date }, 'createdAt')
-          );
-          
-          acc[key] = {
-            ...data,
-            chartData: filteredChartData,
-          };
+          try {
+            const filteredChartData = data.chartData.filter(item => 
+              filterFn({ createdAt: item.date }, 'createdAt')
+            );
+            
+            acc[key] = {
+              ...data,
+              chartData: filteredChartData,
+            };
+          } catch (filterError) {
+            console.warn(`Error filtering ${key} data:`, filterError);
+            acc[key] = data; // Use unfiltered data as fallback
+          }
           return acc;
         }, {});
         
         setMetrics(filteredData);
         setChartData(filteredData[selectedMetric] || filteredData.users);
       } catch (error) {
+        console.error('Analytics fetch error:', error);
         showError('Failed to load analytics data');
+        // Fallback to default data
+        setMetrics(mockData);
+        setChartData(mockData[selectedMetric] || mockData.users);
       } finally {
         setLoading(false);
       }
@@ -166,8 +207,8 @@ const Analytics = () => {
 
   const handleDateRangeChange = (e) => {
     const newDateRange = e.target.value;
-    // Update URL with query parameter and refresh page
-    window.location.href = `/analytics?dateRange=${newDateRange}`;
+    // Update URL with query parameter using React Router
+    navigate(`/analytics?dateRange=${newDateRange}`);
   };
 
   if (!hasPermission('analytics:read')) {
@@ -289,16 +330,20 @@ const Analytics = () => {
         
         <div className="chart-container">
           <div className="simple-chart">
-            {chartData.chartData?.map((point, index) => (
-              <div key={index} className="chart-point">
-                <div className="chart-bar" style={{
-                  height: `${(point.value / Math.max(...(chartData.chartData?.map(p => p.value) || [1]))) * 100}%`
-                }}>
-                  <div className="chart-value">{formatNumber(point.value)}</div>
+            {chartData.chartData && chartData.chartData.length > 0 ? (
+              chartData.chartData.map((point, index) => (
+                <div key={index} className="chart-point">
+                  <div className="chart-bar" style={{
+                    height: `${(point.value / Math.max(...(chartData.chartData?.map(p => p.value) || [1]))) * 100}%`
+                  }}>
+                    <div className="chart-value">{formatNumber(point.value)}</div>
+                  </div>
+                  <div className="chart-date">{formatDate(point.date, 'MMM dd')}</div>
                 </div>
-                <div className="chart-date">{formatDate(point.date, 'MMM dd')}</div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="no-data">No data available for selected date range</div>
+            )}
           </div>
         </div>
       </div>
