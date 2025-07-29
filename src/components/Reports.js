@@ -16,7 +16,7 @@ const Reports = () => {
   const { hasPermission } = useAuth();
   const { showSuccess, showError } = useNotifications();
 
-  // Mock reports data
+  // Reports data
   const mockReports = [
     {
       id: '1',
