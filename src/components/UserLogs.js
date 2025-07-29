@@ -60,7 +60,6 @@ const UserLogs = () => {
 
       {selectedUser ? (
         <div className="logs-container">
-          {/* This component has the problematic useEffect hooks */}
           <ActivityLog userId={selectedUser} />
         </div>
       ) : (
