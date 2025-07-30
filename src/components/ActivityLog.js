@@ -67,18 +67,19 @@ const ActivityLog = ({ userId }) => {
         setLoading(false);
       });
     }
-  }, [userId, filters, pagination.page]);
+  }, [userId, filters.action, filters.date]); 
 
   useEffect(() => {
     if (user) {
       document.title = `Activity Log - ${user.name}`;
       
+      // Only set userName if it's not already set to avoid infinite loop
       setFilters(prevFilters => ({
         ...prevFilters,
         userName: user.name
       }));
     }
-  }, [user, location.pathname]);
+  }, [user]); 
 
   useEffect(() => {
     if (logs.length > 0) {
@@ -92,27 +93,27 @@ const ActivityLog = ({ userId }) => {
     }
   }, [logs, pagination.page, pagination.total]);
 
-  useEffect(() => {
-    if (filters.userName) {
-      setUser(prevUser => ({ 
-        ...prevUser, 
-        displayName: filters.userName,
-        lastActivity: new Date().toISOString()
-      }));
-      setPagination(prev => ({ ...prev, page: 1 }));
-      setLoading(true);
-      setError(null);
+  // useEffect(() => {
+  //   if (filters.userName) {
+  //     setUser(prevUser => ({ 
+  //       ...prevUser, 
+  //       displayName: filters.userName,
+  //       lastActivity: new Date().toISOString()
+  //     }));
+  //     setPagination(prev => ({ ...prev, page: 1 }));
+  //     setLoading(true);
+  //     setError(null);
       
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        lastUpdated: Date.now(),
-        activeUser: filters.userName,
-        syncedAt: new Date().toISOString()
-      }));
+  //     setFilters(prevFilters => ({
+  //       ...prevFilters,
+  //       lastUpdated: Date.now(),
+  //       activeUser: filters.userName,
+  //       syncedAt: new Date().toISOString()
+  //     }));
       
-      setLogs([]);
-    }
-  }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
+  //     setLogs([]);
+  //   }
+  // }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
 
   useEffect(() => {
     if (user && logs.length > 0) {

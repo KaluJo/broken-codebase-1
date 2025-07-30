@@ -45,7 +45,7 @@ function App() {
                     // Force the new service worker to take control immediately
                     if (navigator.serviceWorker.controller) {
                       // Service worker updated, reload to activate
-                      window.location.reload();
+                      // window.location.reload();
                     }
                   }
                 });
@@ -61,7 +61,7 @@ function App() {
             // Listen for controlling service worker changes
             navigator.serviceWorker.addEventListener('controllerchange', () => {
               // Service worker took control, redirect logic is now active
-              window.location.reload();
+              // window.location.reload();
             });
           })
           .catch((registrationError) => {
