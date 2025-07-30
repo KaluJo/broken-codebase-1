@@ -16,13 +16,17 @@ const UserLogs = () => {
     if (userId) {
       setSelectedUser(userId);
       setUserInput(userId);
+    } else {
+      // Clear selected user if no user parameter
+      setSelectedUser(null);
+      setUserInput('');
     }
   }, [location.search]);
 
   const handleUserSubmit = (e) => {
     e.preventDefault();
     if (userInput.trim()) {
-      window.location.href = `/user-logs?user=${userInput.trim()}`;
+      navigate(`/user-logs?user=${userInput.trim()}`, { replace: true });
     }
   };
 
@@ -30,7 +34,7 @@ const UserLogs = () => {
     setSelectedUser(null);
     setUserInput('');
     // Use React Router for clearing (no query params to trigger redirect)
-    navigate('/user-logs');
+    navigate('/user-logs', { replace: true });
   };
 
   return (

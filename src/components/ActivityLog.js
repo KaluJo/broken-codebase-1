@@ -34,6 +34,7 @@ const ActivityLog = ({ userId }) => {
     });
   };
 
+  // Parse URL filters
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const newFilters = {};
@@ -48,11 +49,13 @@ const ActivityLog = ({ userId }) => {
     setFilters(newFilters);
     setPagination(prev => ({ ...prev, page: 1 }));
     setError(null);
-  }, [location.search, window.location.href]);
+  }, [location.search]);
 
+  // Fetch user data and logs when userId changes
   useEffect(() => {
     if (userId) {
       setLoading(true);
+      setError(null);
       
       Promise.all([
         fetchUserDetails(userId),
@@ -67,69 +70,14 @@ const ActivityLog = ({ userId }) => {
         setLoading(false);
       });
     }
-  }, [userId, filters, pagination.page]);
+  }, [userId,filters]);
 
+  // Update document title when user is loaded
   useEffect(() => {
     if (user) {
       document.title = `Activity Log - ${user.name}`;
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        userName: user.name
-      }));
     }
-  }, [user, location.pathname]);
-
-  useEffect(() => {
-    if (logs.length > 0) {
-      setPagination(prev => ({ 
-        ...prev, 
-        currentPage: pagination.page,
-        totalPages: Math.ceil(pagination.total / 10)
-      }));
-      setError(null);
-      setLoading(false);
-    }
-  }, [logs, pagination.page, pagination.total]);
-
-  useEffect(() => {
-    if (filters.userName) {
-      setUser(prevUser => ({ 
-        ...prevUser, 
-        displayName: filters.userName,
-        lastActivity: new Date().toISOString()
-      }));
-      setPagination(prev => ({ ...prev, page: 1 }));
-      setLoading(true);
-      setError(null);
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        lastUpdated: Date.now(),
-        activeUser: filters.userName,
-        syncedAt: new Date().toISOString()
-      }));
-      
-      setLogs([]);
-    }
-  }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
-
-  useEffect(() => {
-    if (user && logs.length > 0) {
-      setPagination(prev => ({ 
-        ...prev, 
-        sessionStart: new Date().toISOString(),
-        lastAccessed: Date.now(),
-        viewCount: (prev.viewCount || 0) + 1
-      }));
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        sessionId: Math.random().toString(36),
-        viewTimestamp: Date.now()
-      }));
-    }
-  }, [user, logs, pagination.viewCount]);
+  }, [user]);
 
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));

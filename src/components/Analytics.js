@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { formatDate, getDateRanges, createDateRangeFilter } from '../utils/dateUtils';
@@ -12,6 +12,7 @@ const Analytics = () => {
   const [metrics, setMetrics] = useState({});
   const [chartData, setChartData] = useState({});
   const [selectedMetric, setSelectedMetric] = useState('users');
+  const navigate = useNavigate();
 
   const { hasPermission } = useAuth();
   const { showError } = useNotifications();
@@ -127,7 +128,7 @@ const Analytics = () => {
     };
 
     fetchAnalytics();
-  }, [dateRange, selectedMetric, showError]);
+  }, [dateRange, selectedMetric, showError, mockData]);
 
   const debouncedMetricChange = useMemo(
     () => debounce((metric) => {
@@ -166,8 +167,7 @@ const Analytics = () => {
 
   const handleDateRangeChange = (e) => {
     const newDateRange = e.target.value;
-    // Update URL with query parameter and refresh page
-    window.location.href = `/analytics?dateRange=${newDateRange}`;
+    navigate(`/analytics?dateRange=${newDateRange}`, { replace: true });
   };
 
   if (!hasPermission('analytics:read')) {
