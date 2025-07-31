@@ -140,7 +140,7 @@ export const ThemeProvider = ({ children }) => {
     // Save to localStorage
     localStorageService.setItem('currentTheme', state.currentTheme);
     localStorageService.setItem('themePreferences', state.preferences);
-  }, [state.theme, state.currentTheme, state.preferences]);
+  }, [state.currentTheme]); // Only depend on currentTheme, not the entire state object
 
   const setTheme = (themeName) => {
     if (themes[themeName]) {

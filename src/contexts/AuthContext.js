@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [state.sessionExpiry, state.isAuthenticated]);
+  }, [state.sessionExpiry]); // Only depend on sessionExpiry, not isAuthenticated
 
   const login = async (credentials) => {
     try {

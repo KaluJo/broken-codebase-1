@@ -44,25 +44,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  if (url.search) {    
-    if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-      event.respondWith(
-        Response.redirect('/', 302)
-      );
-      return;
-    }
-    
-    event.respondWith(
-      caches.match('/').then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch('/');
-      })
-    );
-    return;
-  }
-  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

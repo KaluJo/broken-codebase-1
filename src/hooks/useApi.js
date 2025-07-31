@@ -114,7 +114,7 @@ export const useApi = (endpoint, options = {}) => {
         cancelTokenRef.current = null;
       }
     }
-  }, [endpoint, method, transform, onSuccess, onError, retry, retryDelay]);
+  }, [endpoint, method]); // Remove transform, onSuccess, onError, retry, retryDelay from dependencies
 
   // Auto-fetch on dependency changes
   useEffect(() => {
