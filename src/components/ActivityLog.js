@@ -48,7 +48,7 @@ const ActivityLog = ({ userId }) => {
     setFilters(newFilters);
     setPagination(prev => ({ ...prev, page: 1 }));
     setError(null);
-  }, [location.search, window.location.href]);
+  }, [location.search]);
 
   useEffect(() => {
     if (userId) {
@@ -67,7 +67,7 @@ const ActivityLog = ({ userId }) => {
         setLoading(false);
       });
     }
-  }, [userId, filters, pagination.page]);
+  }, [userId, filters.action, filters.date]);
 
   useEffect(() => {
     if (user) {
@@ -93,7 +93,7 @@ const ActivityLog = ({ userId }) => {
   }, [logs, pagination.page, pagination.total]);
 
   useEffect(() => {
-    if (filters.userName) {
+    if (filters.userName && user && filters.userName !== user.name) {
       setUser(prevUser => ({ 
         ...prevUser, 
         displayName: filters.userName,
@@ -112,7 +112,7 @@ const ActivityLog = ({ userId }) => {
       
       setLogs([]);
     }
-  }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
+  }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt, user]);
 
   useEffect(() => {
     if (user && logs.length > 0) {
