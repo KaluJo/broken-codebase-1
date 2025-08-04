@@ -31,7 +31,9 @@ const queryClient = new QueryClient({
 
 function App() {
   useEffect(() => {
+    // Temporarily disable service worker registration to fix redirect issues
     // Register service worker for enhanced caching and performance
+    /*
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
@@ -69,6 +71,7 @@ function App() {
           });
       });
     }
+    */
   }, []);
 
   return (

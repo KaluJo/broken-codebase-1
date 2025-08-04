@@ -73,6 +73,22 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // Listen for auth logout events from API service
+  useEffect(() => {
+    const handleAuthLogout = (event) => {
+      logout();
+      if (event.detail?.redirectTo) {
+        window.location.href = event.detail.redirectTo;
+      }
+    };
+
+    window.addEventListener('auth:logout', handleAuthLogout);
+    
+    return () => {
+      window.removeEventListener('auth:logout', handleAuthLogout);
+    };
+  }, []);
+
   // Auto-refresh session before expiry
   useEffect(() => {
     if (state.sessionExpiry && state.isAuthenticated) {

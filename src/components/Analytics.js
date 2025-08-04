@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { formatDate, getDateRanges, createDateRangeFilter } from '../utils/dateUtils';
@@ -7,6 +7,7 @@ import { debounce } from '../utils/performanceUtils';
 
 const Analytics = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('last30Days');
   const [metrics, setMetrics] = useState({});
@@ -27,6 +28,38 @@ const Analytics = () => {
         { date: '2024-01-15', value: 14100 },
         { date: '2024-01-22', value: 14800 },
         { date: '2024-01-29', value: 15284 },
+        { date: '2024-01-30', value: 15420 },
+        { date: '2024-01-31', value: 15500 },
+        { date: '2024-02-01', value: 15600 },
+        { date: '2024-02-02', value: 15750 },
+        { date: '2024-02-03', value: 15800 },
+        { date: '2024-02-04', value: 15900 },
+        { date: '2024-02-05', value: 16000 },
+        { date: '2024-02-06', value: 16100 },
+        { date: '2024-02-07', value: 16200 },
+        { date: '2024-02-08', value: 16300 },
+        { date: '2024-02-09', value: 16400 },
+        { date: '2024-02-10', value: 16500 },
+        { date: '2024-02-11', value: 16600 },
+        { date: '2024-02-12', value: 16700 },
+        { date: '2024-02-13', value: 16800 },
+        { date: '2024-02-14', value: 16900 },
+        { date: '2024-02-15', value: 17000 },
+        { date: '2024-02-16', value: 17100 },
+        { date: '2024-02-17', value: 17200 },
+        { date: '2024-02-18', value: 17300 },
+        { date: '2024-02-19', value: 17400 },
+        { date: '2024-02-20', value: 17500 },
+        { date: '2024-02-21', value: 17600 },
+        { date: '2024-02-22', value: 17700 },
+        { date: '2024-02-23', value: 17800 },
+        { date: '2024-02-24', value: 17900 },
+        { date: '2024-02-25', value: 18000 },
+        { date: '2024-02-26', value: 18100 },
+        { date: '2024-02-27', value: 18200 },
+        { date: '2024-02-28', value: 18300 },
+        { date: '2024-02-29', value: 18400 },
+        { date: '2024-03-01', value: 18500 },
       ],
     },
     revenue: {
@@ -39,6 +72,38 @@ const Analytics = () => {
         { date: '2024-01-15', value: 90100.75 },
         { date: '2024-01-22', value: 89950.00 },
         { date: '2024-01-29', value: 89745.50 },
+        { date: '2024-01-30', value: 89600.00 },
+        { date: '2024-01-31', value: 89450.00 },
+        { date: '2024-02-01', value: 89300.00 },
+        { date: '2024-02-02', value: 89150.00 },
+        { date: '2024-02-03', value: 89000.00 },
+        { date: '2024-02-04', value: 88850.00 },
+        { date: '2024-02-05', value: 88700.00 },
+        { date: '2024-02-06', value: 88550.00 },
+        { date: '2024-02-07', value: 88400.00 },
+        { date: '2024-02-08', value: 88250.00 },
+        { date: '2024-02-09', value: 88100.00 },
+        { date: '2024-02-10', value: 87950.00 },
+        { date: '2024-02-11', value: 87800.00 },
+        { date: '2024-02-12', value: 87650.00 },
+        { date: '2024-02-13', value: 87500.00 },
+        { date: '2024-02-14', value: 87350.00 },
+        { date: '2024-02-15', value: 87200.00 },
+        { date: '2024-02-16', value: 87050.00 },
+        { date: '2024-02-17', value: 86900.00 },
+        { date: '2024-02-18', value: 86750.00 },
+        { date: '2024-02-19', value: 86600.00 },
+        { date: '2024-02-20', value: 86450.00 },
+        { date: '2024-02-21', value: 86300.00 },
+        { date: '2024-02-22', value: 86150.00 },
+        { date: '2024-02-23', value: 86000.00 },
+        { date: '2024-02-24', value: 85850.00 },
+        { date: '2024-02-25', value: 85700.00 },
+        { date: '2024-02-26', value: 85550.00 },
+        { date: '2024-02-27', value: 85400.00 },
+        { date: '2024-02-28', value: 85250.00 },
+        { date: '2024-02-29', value: 85100.00 },
+        { date: '2024-03-01', value: 84950.00 },
       ],
     },
     sessions: {
@@ -51,6 +116,38 @@ const Analytics = () => {
         { date: '2024-01-15', value: 44200 },
         { date: '2024-01-22', value: 45100 },
         { date: '2024-01-29', value: 45672 },
+        { date: '2024-01-30', value: 45800 },
+        { date: '2024-01-31', value: 45900 },
+        { date: '2024-02-01', value: 46000 },
+        { date: '2024-02-02', value: 46100 },
+        { date: '2024-02-03', value: 46200 },
+        { date: '2024-02-04', value: 46300 },
+        { date: '2024-02-05', value: 46400 },
+        { date: '2024-02-06', value: 46500 },
+        { date: '2024-02-07', value: 46600 },
+        { date: '2024-02-08', value: 46700 },
+        { date: '2024-02-09', value: 46800 },
+        { date: '2024-02-10', value: 46900 },
+        { date: '2024-02-11', value: 47000 },
+        { date: '2024-02-12', value: 47100 },
+        { date: '2024-02-13', value: 47200 },
+        { date: '2024-02-14', value: 47300 },
+        { date: '2024-02-15', value: 47400 },
+        { date: '2024-02-16', value: 47500 },
+        { date: '2024-02-17', value: 47600 },
+        { date: '2024-02-18', value: 47700 },
+        { date: '2024-02-19', value: 47800 },
+        { date: '2024-02-20', value: 47900 },
+        { date: '2024-02-21', value: 48000 },
+        { date: '2024-02-22', value: 48100 },
+        { date: '2024-02-23', value: 48200 },
+        { date: '2024-02-24', value: 48300 },
+        { date: '2024-02-25', value: 48400 },
+        { date: '2024-02-26', value: 48500 },
+        { date: '2024-02-27', value: 48600 },
+        { date: '2024-02-28', value: 48700 },
+        { date: '2024-02-29', value: 48800 },
+        { date: '2024-03-01', value: 48900 },
       ],
     },
     conversion: {
@@ -63,6 +160,38 @@ const Analytics = () => {
         { date: '2024-01-15', value: 3.38 },
         { date: '2024-01-22', value: 3.42 },
         { date: '2024-01-29', value: 3.47 },
+        { date: '2024-01-30', value: 3.48 },
+        { date: '2024-01-31', value: 3.49 },
+        { date: '2024-02-01', value: 3.50 },
+        { date: '2024-02-02', value: 3.51 },
+        { date: '2024-02-03', value: 3.52 },
+        { date: '2024-02-04', value: 3.53 },
+        { date: '2024-02-05', value: 3.54 },
+        { date: '2024-02-06', value: 3.55 },
+        { date: '2024-02-07', value: 3.56 },
+        { date: '2024-02-08', value: 3.57 },
+        { date: '2024-02-09', value: 3.58 },
+        { date: '2024-02-10', value: 3.59 },
+        { date: '2024-02-11', value: 3.60 },
+        { date: '2024-02-12', value: 3.61 },
+        { date: '2024-02-13', value: 3.62 },
+        { date: '2024-02-14', value: 3.63 },
+        { date: '2024-02-15', value: 3.64 },
+        { date: '2024-02-16', value: 3.65 },
+        { date: '2024-02-17', value: 3.66 },
+        { date: '2024-02-18', value: 3.67 },
+        { date: '2024-02-19', value: 3.68 },
+        { date: '2024-02-20', value: 3.69 },
+        { date: '2024-02-21', value: 3.70 },
+        { date: '2024-02-22', value: 3.71 },
+        { date: '2024-02-23', value: 3.72 },
+        { date: '2024-02-24', value: 3.73 },
+        { date: '2024-02-25', value: 3.74 },
+        { date: '2024-02-26', value: 3.75 },
+        { date: '2024-02-27', value: 3.76 },
+        { date: '2024-02-28', value: 3.77 },
+        { date: '2024-02-29', value: 3.78 },
+        { date: '2024-03-01', value: 3.79 },
       ],
     },
   };
@@ -110,8 +239,35 @@ const Analytics = () => {
             filterFn({ createdAt: item.date }, 'createdAt')
           );
           
+          // Calculate metrics based on filtered data
+          let total, change, trend;
+          
+          if (filteredChartData.length > 0) {
+            // Calculate total from the latest value in the filtered range
+            total = filteredChartData[filteredChartData.length - 1].value;
+            
+            // Calculate change percentage based on first and last values
+            if (filteredChartData.length > 1) {
+              const firstValue = filteredChartData[0].value;
+              const lastValue = filteredChartData[filteredChartData.length - 1].value;
+              change = ((lastValue - firstValue) / firstValue) * 100;
+              trend = change >= 0 ? 'up' : 'down';
+            } else {
+              // If only one data point, use a small random change
+              change = Math.random() * 10 - 5; // -5 to +5%
+              trend = change >= 0 ? 'up' : 'down';
+            }
+          } else {
+            // No data in range, use default values
+            total = data.total;
+            change = data.change;
+            trend = data.trend;
+          }
+          
           acc[key] = {
-            ...data,
+            total,
+            change: Math.round(change * 100) / 100, // Round to 2 decimal places
+            trend,
             chartData: filteredChartData,
           };
           return acc;
@@ -166,8 +322,8 @@ const Analytics = () => {
 
   const handleDateRangeChange = (e) => {
     const newDateRange = e.target.value;
-    // Update URL with query parameter and refresh page
-    window.location.href = `/analytics?dateRange=${newDateRange}`;
+    // Update URL with query parameter using React Router
+    navigate(`/analytics?dateRange=${newDateRange}`);
   };
 
   if (!hasPermission('analytics:read')) {

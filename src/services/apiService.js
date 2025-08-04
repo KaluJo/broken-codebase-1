@@ -62,7 +62,10 @@ api.interceptors.response.use(
           // Unauthorized - clear token and redirect to login
           localStorageService.removeToken();
           if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
+            // Use a more React-friendly approach - dispatch a custom event
+            window.dispatchEvent(new CustomEvent('auth:logout', { 
+              detail: { redirectTo: '/login' } 
+            }));
           }
           break;
         case 403:

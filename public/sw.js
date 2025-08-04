@@ -44,14 +44,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  if (url.search) {    
-    if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-      event.respondWith(
-        Response.redirect('/', 302)
-      );
+  // Allow query parameters for legitimate navigation (analytics, filters, etc.)
+  if (url.search && (event.request.mode === 'navigate' || event.request.destination === 'document')) {
+    // Check if this is a legitimate route that should allow query parameters
+    const pathname = url.pathname;
+    const allowedQueryRoutes = ['/analytics', '/user-logs', '/reports', '/settings'];
+    
+    if (allowedQueryRoutes.some(route => pathname.startsWith(route))) {
+      // Allow the request to proceed normally
       return;
     }
     
+    // For other routes with query parameters, redirect to root
+    event.respondWith(
+      Response.redirect('/', 302)
+    );
+    return;
+  }
+  
+  if (url.search) {
     event.respondWith(
       caches.match('/').then((response) => {
         if (response) {

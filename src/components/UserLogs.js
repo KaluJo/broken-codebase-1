@@ -22,7 +22,8 @@ const UserLogs = () => {
   const handleUserSubmit = (e) => {
     e.preventDefault();
     if (userInput.trim()) {
-      window.location.href = `/user-logs?user=${userInput.trim()}`;
+      // Use React Router navigate instead of window.location.href
+      navigate(`/user-logs?user=${userInput.trim()}`);
     }
   };
 
