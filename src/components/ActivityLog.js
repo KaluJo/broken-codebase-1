@@ -48,11 +48,12 @@ const ActivityLog = ({ userId }) => {
     setFilters(newFilters);
     setPagination(prev => ({ ...prev, page: 1 }));
     setError(null);
-  }, [location.search, window.location.href]);
+  }, [location.search]);
 
   useEffect(() => {
     if (userId) {
       setLoading(true);
+      setError(null);
       
       Promise.all([
         fetchUserDetails(userId),
@@ -60,14 +61,19 @@ const ActivityLog = ({ userId }) => {
       ]).then(([userDetails, logsData]) => {
         setUser(userDetails);
         setLogs(logsData.logs);
-        setPagination(prev => ({ ...prev, total: logsData.total }));
+        setPagination(prev => ({ 
+          ...prev, 
+          total: logsData.total,
+          currentPage: prev.page,
+          totalPages: Math.ceil(logsData.total / 10)
+        }));
         setLoading(false);
       }).catch((err) => {
         setError(err.message);
         setLoading(false);
       });
     }
-  }, [userId, filters, pagination.page]);
+  }, [userId, filters.action, filters.date]);
 
   useEffect(() => {
     if (user) {
@@ -93,15 +99,12 @@ const ActivityLog = ({ userId }) => {
   }, [logs, pagination.page, pagination.total]);
 
   useEffect(() => {
-    if (filters.userName) {
+    if (filters.userName && user) {
       setUser(prevUser => ({ 
         ...prevUser, 
         displayName: filters.userName,
         lastActivity: new Date().toISOString()
       }));
-      setPagination(prev => ({ ...prev, page: 1 }));
-      setLoading(true);
-      setError(null);
       
       setFilters(prevFilters => ({
         ...prevFilters,
@@ -109,10 +112,8 @@ const ActivityLog = ({ userId }) => {
         activeUser: filters.userName,
         syncedAt: new Date().toISOString()
       }));
-      
-      setLogs([]);
     }
-  }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
+  }, [filters.userName, filters.action, filters.date]);
 
   useEffect(() => {
     if (user && logs.length > 0) {
@@ -122,14 +123,8 @@ const ActivityLog = ({ userId }) => {
         lastAccessed: Date.now(),
         viewCount: (prev.viewCount || 0) + 1
       }));
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        sessionId: Math.random().toString(36),
-        viewTimestamp: Date.now()
-      }));
     }
-  }, [user, logs, pagination.viewCount]);
+  }, [user, logs]);
 
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
