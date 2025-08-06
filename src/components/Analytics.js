@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { formatDate, getDateRanges, createDateRangeFilter } from '../utils/dateUtils';
@@ -7,6 +7,7 @@ import { debounce } from '../utils/performanceUtils';
 
 const Analytics = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('last30Days');
   const [metrics, setMetrics] = useState({});
@@ -166,8 +167,8 @@ const Analytics = () => {
 
   const handleDateRangeChange = (e) => {
     const newDateRange = e.target.value;
-    // Update URL with query parameter and refresh page
-    window.location.href = `/analytics?dateRange=${newDateRange}`;
+    // Update URL with query parameter using React Router
+    navigate(`/analytics?dateRange=${newDateRange}`);
   };
 
   if (!hasPermission('analytics:read')) {

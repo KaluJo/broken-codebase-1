@@ -44,25 +44,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  if (url.search) {    
-    if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-      event.respondWith(
-        Response.redirect('/', 302)
-      );
-      return;
-    }
-    
+  // Handle navigation requests with query parameters normally
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
     event.respondWith(
-      caches.match('/').then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch('/');
+      fetch(event.request).catch(() => {
+        return caches.match('/');
       })
     );
     return;
   }
   
+  // For non-navigation requests, try cache first, then network
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
