@@ -5,13 +5,11 @@ const ActivityLog = ({ userId }) => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [filters, setFilters] = useState({});
-  const [pagination, setPagination] = useState({ page: 1, total: 0 });
   const [error, setError] = useState(null);
   
   const location = useLocation();
 
-  const fetchUserLogs = async (userId, filters = {}) => {
+  const fetchUserLogs = async (userId) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
@@ -35,105 +33,23 @@ const ActivityLog = ({ userId }) => {
   };
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const newFilters = {};
-    
-    if (searchParams.get('action')) {
-      newFilters.action = searchParams.get('action');
-    }
-    if (searchParams.get('date')) {
-      newFilters.date = searchParams.get('date');
-    }
-    
-    setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 1 }));
-    setError(null);
-  }, [location.search, window.location.href]);
-
-  useEffect(() => {
     if (userId) {
       setLoading(true);
+      setError(null);
       
       Promise.all([
         fetchUserDetails(userId),
-        fetchUserLogs(userId, filters)
+        fetchUserLogs(userId)
       ]).then(([userDetails, logsData]) => {
         setUser(userDetails);
         setLogs(logsData.logs);
-        setPagination(prev => ({ ...prev, total: logsData.total }));
         setLoading(false);
       }).catch((err) => {
         setError(err.message);
         setLoading(false);
       });
     }
-  }, [userId, filters, pagination.page]);
-
-  useEffect(() => {
-    if (user) {
-      document.title = `Activity Log - ${user.name}`;
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        userName: user.name
-      }));
-    }
-  }, [user, location.pathname]);
-
-  useEffect(() => {
-    if (logs.length > 0) {
-      setPagination(prev => ({ 
-        ...prev, 
-        currentPage: pagination.page,
-        totalPages: Math.ceil(pagination.total / 10)
-      }));
-      setError(null);
-      setLoading(false);
-    }
-  }, [logs, pagination.page, pagination.total]);
-
-  useEffect(() => {
-    if (filters.userName) {
-      setUser(prevUser => ({ 
-        ...prevUser, 
-        displayName: filters.userName,
-        lastActivity: new Date().toISOString()
-      }));
-      setPagination(prev => ({ ...prev, page: 1 }));
-      setLoading(true);
-      setError(null);
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        lastUpdated: Date.now(),
-        activeUser: filters.userName,
-        syncedAt: new Date().toISOString()
-      }));
-      
-      setLogs([]);
-    }
-  }, [filters.userName, filters.action, filters.date, filters.lastUpdated, filters.syncedAt]);
-
-  useEffect(() => {
-    if (user && logs.length > 0) {
-      setPagination(prev => ({ 
-        ...prev, 
-        sessionStart: new Date().toISOString(),
-        lastAccessed: Date.now(),
-        viewCount: (prev.viewCount || 0) + 1
-      }));
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        sessionId: Math.random().toString(36),
-        viewTimestamp: Date.now()
-      }));
-    }
-  }, [user, logs, pagination.viewCount]);
-
-  const handlePageChange = (newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
-  };
+  }, [userId]);
 
   if (loading) {
     return <div className="loading">Loading activity logs...</div>;
@@ -147,12 +63,6 @@ const ActivityLog = ({ userId }) => {
     <div className="activity-log">
       <h3>Activity Log for {user?.name || `User ${userId}`}</h3>
       
-      {filters.action && (
-        <div className="filter-info">
-          Filtered by action: {filters.action}
-        </div>
-      )}
-      
       <div className="log-entries">
         {logs.map(log => (
           <div key={log.id} className="log-entry">
@@ -163,21 +73,11 @@ const ActivityLog = ({ userId }) => {
         ))}
       </div>
       
-      <div className="pagination">
-        <button 
-          onClick={() => handlePageChange(pagination.page - 1)}
-          disabled={pagination.page <= 1}
-        >
-          Previous
-        </button>
-        <span>Page {pagination.page}</span>
-        <button 
-          onClick={() => handlePageChange(pagination.page + 1)}
-          disabled={logs.length === 0}
-        >
-          Next
-        </button>
-      </div>
+      {logs.length === 0 && !loading && (
+        <div className="no-logs">
+          <p>No activity logs found for this user.</p>
+        </div>
+      )}
     </div>
   );
 };
